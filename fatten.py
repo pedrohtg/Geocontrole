@@ -117,4 +117,4 @@ def fatten(rlwshp, outshapename):
 if __name__ == "__main__":
     rlwshp = sys.argv[1]
     outshapename = sys.argv[2]
-	fatten(rlwshp, outshapename)
+    fatten(rlwshp, outshapename)
