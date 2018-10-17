@@ -69,7 +69,9 @@ def translate_point(p, direction, alpha=5.1):
     return (xnew, ynew)
 
 def fatten(rlwshp, outshapename):
-    ds = gdal.Open(rlwshp)
+    print(rlwshp)
+    print(outshapename)
+    ds = ogr.Open(rlwshp)
     layer = ds.GetLayer(0)
     lims = extract_railway_line_limits_from_shapefile(layer)
 
