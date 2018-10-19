@@ -82,9 +82,13 @@ def fatten(rlwshp, outshapename):
     if os.path.exists(outshapename):
         outDriver.DeleteDataSource(outshapename)
     
+    # create the spatial reference
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(31984)
+
     # Create the output shapefile
     outDataSource = outDriver.CreateDataSource(outshapename)
-    outLayer = outDataSource.CreateLayer("railway track polygons", geom_type=ogr.wkbPolygon)
+    outLayer = outDataSource.CreateLayer("railway track polygons", srs, geom_type=ogr.wkbPolygon)
     
     # Add an ID field
     idField = ogr.FieldDefn("id", ogr.OFTInteger)
