@@ -17,8 +17,6 @@ def CoordinateToPixel(gt, c):
     c1 = c[0] - gt[0] if gt[1] > 0 else gt[0] - c[0]
     c2 = c[1] - gt[3] if gt[5] < 0 else gt[3] - c[1]
 
-    #print (gt[1], gt[5])
-
     if gt[2] == 0:
         x = c1/gt[1]
     if gt[4] == 0 :
@@ -67,11 +65,21 @@ def GetExtent(gt,cols,rows):
             x=gt[0]+(px*gt[1])+(py*gt[2])
             y=gt[3]+(px*gt[4])+(py*gt[5])
             ext.append([x,y])
-            #print x,y
         yarr.reverse()
     return ext
 
 def GetExtentGeometry(gt, cols, rows):
+    ''' Return extent as geometry
+        @type gt:   C{tuple/list}
+        @param gt: geotransform
+        @type cols:   C{int}
+        @param cols: number of columns in the dataset
+        @type rows:   C{int}
+        @param rows: number of rows in the dataset
+        @rtype:    C{[float,...,float]}
+        @return:   coordinates of each corner
+    '''
+
     ext = GetExtent(gt,cols,rows)
 
     ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -88,8 +96,8 @@ def GetExtentGeometry(gt, cols, rows):
 def ReprojectCoords(coords,src_srs,tgt_srs):
     ''' Reproject a list of x,y coordinates.
 
-        @type geom:     C{tuple/list}
-        @param geom:    List of [[x,y],...[x,y]] coordinates
+        @type coords:     C{tuple/list}
+        @param coords:    List of [[x,y],...[x,y]] coordinates
         @type src_srs:  C{osr.SpatialReference}
         @param src_srs: OSR SpatialReference object
         @type tgt_srs:  C{osr.SpatialReference}
@@ -103,5 +111,26 @@ def ReprojectCoords(coords,src_srs,tgt_srs):
         x,y,z = transform.TransformPoint(x,y)
         trans_coords.append([x,y])
     return trans_coords
+
+def CreatePolygon(points):
+    ''' Create a polygon from a list of ordered coordinate points.
+        Assume that the list contains at least 3 non colinear points
+
+        @type points:     C{tuple/list}
+        @param points:    List of [(x,y),...(x,y)] coordinates vertices 
+        
+        @rtype:           OGR Geometry
+        @return:          Polygon defined by the vertices
+    '''
+    poly = ogr.Geometry(ogr.wkbPolygon)
+
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    for p in points:
+        ring.AddPoint(p[0], p[1])
+    ring.AddPoint(points[0][0], points[0][1])
+    ring.CloseRings()
+    poly.AddGeometry(ring)
+
+    return poly
 
 
